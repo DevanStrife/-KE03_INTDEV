@@ -1,0 +1,89 @@
+@page
+@model MatrixInc.Web.Pages.OrderConfirmationModel
+@{
+    ViewData["Title"] = "Bestelling bevestigd";
+}
+
+<div class="text-center py-5">
+    <i class="bi bi-check-circle-fill text-success" style="font-size: 5rem;"></i>
+    <h1 class="mt-4">Bedankt voor uw bestelling!</h1>
+    <p class="lead">Uw bestelling is succesvol geplaatst.</p>
+</div>
+
+@if (Model.Order != null)
+{
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Bestelling #@Model.Order.Id</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <strong>Besteldatum:</strong><br />
+                            @Model.Order.OrderDate.ToString("dd-MM-yyyy HH:mm")
+                        </div>
+                        <div class="col-6">
+                            <strong>Status:</strong><br />
+                            <span class="badge bg-warning">@Model.Order.Status</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <strong>Klantgegevens:</strong><br />
+                        @Model.Order.Customer.Name<br />
+                        @Model.Order.Customer.Email<br />
+                        @Model.Order.Customer.Address
+                    </div>
+
+                    <h6 class="mt-4">Bestelde producten:</h6>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Aantal</th>
+                                    <th>Prijs</th>
+                                    <th>Totaal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.Order.OrderItems)
+                                {
+                                    <tr>
+                                        <td>@item.Product.Name</td>
+                                        <td>@item.Quantity</td>
+                                        <td>€@item.UnitPrice.ToString("F2")</td>
+                                        <td>€@item.TotalPrice.ToString("F2")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="3" class="text-end"><strong>Totaal:</strong></td>
+                                    <td><strong class="text-primary">€@Model.Order.TotalAmount.ToString("F2")</strong></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <a asp-page="/Products/Index" class="btn btn-primary me-2">
+                    <i class="bi bi-shop"></i> Verder winkelen
+                </a>
+                <a asp-page="/Orders/Index" class="btn btn-outline-primary">
+                    <i class="bi bi-list-ul"></i> Mijn bestellingen
+                </a>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="alert alert-warning">
+        Bestelling niet gevonden.
+    </div>
+}

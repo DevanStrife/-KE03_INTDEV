@@ -1,0 +1,82 @@
+@page
+@model MatrixInc.Web.Pages.Orders.IndexModel
+@{
+    ViewData["Title"] = "Mijn bestellingen";
+}
+
+<h1 class="mb-4">Mijn bestellingen</h1>
+
+<div class="mb-4">
+    <form method="get" class="row g-3">
+        <div class="col-md-8">
+            <input type="email" class="form-control" name="email" placeholder="Voer uw e-mailadres in" value="@Model.Email" required />
+        </div>
+        <div class="col-md-4">
+            <button type="submit" class="btn btn-primary w-100">Zoek bestellingen</button>
+        </div>
+    </form>
+</div>
+
+@if (Model.Orders.Any())
+{
+    <div class="row">
+        @foreach (var order in Model.Orders)
+        {
+            <div class="col-12 mb-3">
+                <div class="card shadow-sm">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>Bestelling #@order.Id</strong>
+                            <span class="text-muted ms-2">@order.OrderDate.ToString("dd-MM-yyyy HH:mm")</span>
+                        </div>
+                        <span class="badge bg-@(order.Status == "Pending" ? "warning" : order.Status == "Completed" ? "success" : "info")">
+                            @order.Status
+                        </span>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h6>Producten:</h6>
+                                <ul class="list-unstyled">
+                                    @foreach (var item in order.OrderItems)
+                                    {
+                                        <li class="mb-1">
+                                            <i class="bi bi-box"></i> @item.Product.Name - @item.Quantity x €@item.UnitPrice.ToString("F2")
+                                        </li>
+                                    }
+                                </ul>
+                                @if (!string.IsNullOrEmpty(order.Notes))
+                                {
+                                    <small class="text-muted">
+                                        <strong>Opmerkingen:</strong> @order.Notes
+                                    </small>
+                                }
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <div class="mb-2">
+                                    <small class="text-muted">Totaalbedrag</small>
+                                </div>
+                                <h3 class="text-primary mb-3">€@order.TotalAmount.ToString("F2")</h3>
+                                <a asp-page="/OrderConfirmation" asp-route-orderId="@order.Id" class="btn btn-outline-primary btn-sm">
+                                    <i class="bi bi-eye"></i> Details
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else if (!string.IsNullOrEmpty(Model.Email))
+{
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i> Geen bestellingen gevonden voor dit e-mailadres.
+    </div>
+}
+else
+{
+    <div class="alert alert-secondary">
+        <i class="bi bi-info-circle"></i> Voer uw e-mailadres in om uw bestellingen te bekijken.
+    </div>
+}

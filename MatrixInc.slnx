@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="MatrixInc.Admin/MatrixInc.Admin.csproj" />
+  <Project Path="MatrixInc.DataAccess/MatrixInc.DataAccess.csproj" />
+  <Project Path="MatrixInc.Web/MatrixInc.Web.csproj" />
+</Solution>

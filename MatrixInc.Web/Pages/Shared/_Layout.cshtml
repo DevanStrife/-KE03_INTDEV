@@ -1,0 +1,105 @@
+﻿<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Matrix Inc</title>
+    <script type="importmap"></script>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/MatrixInc.Web.styles.css" asp-append-version="true" />
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+            <div class="container">
+                <a class="navbar-brand fw-bold" asp-page="/Index">
+                    <i class="bi bi-gear-fill"></i> Matrix Inc
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-lg-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link" asp-page="/Index">
+                                <i class="bi bi-house-fill"></i> Home
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-page="/Products/Index">
+                                <i class="bi bi-shop"></i> Producten
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-page="/Orders/Index">
+                                <i class="bi bi-list-ul"></i> Mijn bestellingen
+                            </a>
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link position-relative" asp-page="/Cart">
+                                <i class="bi bi-cart3"></i> Winkelwagen
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container mt-4">
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show">
+                @TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted mt-5 py-3 bg-light">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h6 class="mb-2"><i class="bi bi-gear-fill"></i> Matrix Inc</h6>
+                    <p class="small mb-0">Uw partner voor mechanische onderdelen.</p>
+                </div>
+                <div class="col-md-4">
+                    <h6 class="mb-2"><i class="bi bi-link-45deg"></i> Quick Links</h6>
+                    <ul class="list-unstyled small mb-0">
+                        <li><a asp-page="/Index" class="text-decoration-none">Home</a></li>
+                        <li><a asp-page="/Products/Index" class="text-decoration-none">Producten</a></li>
+                        <li><a asp-page="/Orders/Index" class="text-decoration-none">Mijn bestellingen</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h6 class="mb-2"><i class="bi bi-person-lines-fill"></i> Contact</h6>
+                    <p class="small mb-0">
+                        <i class="bi bi-envelope"></i> info@matrixinc.nl<br />
+                        <i class="bi bi-telephone"></i> +31 123 456 789
+                    </p>
+                </div>
+            </div>
+            <hr class="my-2" />
+            <div class="text-center small">
+                &copy; 2026 Matrix Inc
+            </div>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

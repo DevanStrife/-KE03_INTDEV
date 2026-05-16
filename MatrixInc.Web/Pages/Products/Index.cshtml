@@ -1,0 +1,94 @@
+@page
+@model MatrixInc.Web.Pages.Products.IndexModel
+@{
+    ViewData["Title"] = "Producten";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Onze Producten</h1>
+    <div>
+        <span class="badge bg-primary">@Model.Products.Count() producten</span>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <form method="get" class="row g-3">
+            <div class="col-md-6">
+                <input type="text" class="form-control" name="searchTerm" placeholder="Zoek producten..." value="@Model.SearchTerm" />
+            </div>
+            <div class="col-md-4">
+                <select name="category" class="form-select" asp-items="@Model.CategorySelectList">
+                    <option value="">Alle categorieën</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Zoeken</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@if (Model.Products.Any())
+{
+    <div class="row">
+        @foreach (var product in Model.Products)
+        {
+            <div class="col-md-4 col-lg-3 mb-4">
+                <div class="card h-100 shadow-sm product-card">
+                    <div class="card-body">
+                        <h5 class="card-title">@product.Name</h5>
+                        <p class="text-muted small">@product.Category</p>
+                        <p class="card-text">@product.Description</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="h4 text-primary mb-0">€@product.Price.ToString("F2")</span>
+                            @if (product.StockQuantity > 0)
+                            {
+                                <span class="badge bg-success">Op voorraad</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">Uitverkocht</span>
+                            }
+                        </div>
+                    </div>
+                    <div class="card-footer bg-white border-0">
+                        @if (product.StockQuantity > 0)
+                        {
+                            <form method="post" asp-page-handler="AddToCart">
+                                <input type="hidden" name="productId" value="@product.Id" />
+                                <div class="input-group">
+                                    <input type="number" name="quantity" value="1" min="1" max="@product.StockQuantity" class="form-control" />
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bi bi-cart-plus"></i> Toevoegen
+                                    </button>
+                                </div>
+                            </form>
+                        }
+                        else
+                        {
+                            <button class="btn btn-secondary w-100" disabled>Niet beschikbaar</button>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i> Geen producten gevonden.
+    </div>
+}
+
+@section Styles {
+    <style>
+        .product-card {
+            transition: transform 0.2s;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+    </style>
+}
