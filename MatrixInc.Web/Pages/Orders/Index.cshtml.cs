@@ -1,5 +1,6 @@
 using MatrixInc.DataAccess.Models;
 using MatrixInc.DataAccess.Repositories;
+using MatrixInc.Web.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -7,12 +8,11 @@ namespace MatrixInc.Web.Pages.Orders;
 
 public class IndexModel : PageModel
 {
-    // Tijdelijk uitgeschakeld - database functionaliteit niet beschikbaar
-    // private readonly ICustomerRepository _customerRepository;
+    private readonly OrderService _orderService;
 
-    public IndexModel()
+    public IndexModel(OrderService orderService)
     {
-        // _customerRepository = customerRepository;
+        _orderService = orderService;
     }
 
     public IEnumerable<Order> Orders { get; set; } = new List<Order>();
@@ -22,8 +22,15 @@ public class IndexModel : PageModel
 
     public async Task OnGetAsync()
     {
-        // Tijdelijk uitgeschakeld
-        Orders = new List<Order>();
+        if (!string.IsNullOrEmpty(Email))
+        {
+            Orders = _orderService.GetOrdersByEmail(Email);
+        }
+        else
+        {
+            Orders = new List<Order>();
+        }
+
         await Task.CompletedTask;
     }
 }

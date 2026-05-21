@@ -7,12 +7,11 @@ namespace MatrixInc.Web.Pages;
 
 public class CartModel : PageModel
 {
-    // Tijdelijk uitgeschakeld - database functionaliteit niet beschikbaar
-    // private readonly CartService _cartService;
+    private readonly CartService _cartService;
 
-    public CartModel()
+    public CartModel(CartService cartService)
     {
-        // _cartService = cartService;
+        _cartService = cartService;
     }
 
     public List<CartItem> CartItems { get; set; } = new List<CartItem>();
@@ -20,20 +19,19 @@ public class CartModel : PageModel
 
     public void OnGet()
     {
-        // Tijdelijk uitgeschakeld
-        CartItems = new List<CartItem>();
-        Total = 0;
+        CartItems = _cartService.GetCart();
+        Total = _cartService.GetTotal();
     }
 
     public IActionResult OnPostUpdateQuantity(int productId, int quantity)
     {
-        // Tijdelijk uitgeschakeld
+        _cartService.UpdateQuantity(productId, quantity);
         return RedirectToPage();
     }
 
     public IActionResult OnPostRemove(int productId)
     {
-        // Tijdelijk uitgeschakeld
+        _cartService.RemoveFromCart(productId);
         return RedirectToPage();
     }
 }

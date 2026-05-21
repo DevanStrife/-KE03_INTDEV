@@ -24,9 +24,10 @@ builder.Services.AddRazorPages();
 // builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 // builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 
-// Services (tijdelijk uitgeschakeld)
+// Services
 builder.Services.AddHttpContextAccessor();
-// builder.Services.AddScoped<CartService>();
+builder.Services.AddScoped<CartService>();
+builder.Services.AddScoped<OrderService>();
 
 // Session voor winkelwagen
 builder.Services.AddSession(options =>
