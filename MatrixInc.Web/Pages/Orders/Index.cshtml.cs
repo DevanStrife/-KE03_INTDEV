@@ -8,11 +8,11 @@ namespace MatrixInc.Web.Pages.Orders;
 
 public class IndexModel : PageModel
 {
-    private readonly OrderService _orderService;
+    private readonly ICustomerRepository _customerRepository;
 
-    public IndexModel(OrderService orderService)
+    public IndexModel(ICustomerRepository customerRepository)
     {
-        _orderService = orderService;
+        _customerRepository = customerRepository;
     }
 
     public IEnumerable<Order> Orders { get; set; } = new List<Order>();
@@ -24,13 +24,16 @@ public class IndexModel : PageModel
     {
         if (!string.IsNullOrEmpty(Email))
         {
-            Orders = _orderService.GetOrdersByEmail(Email);
+            // Haal klant en orders uit database
+            var customer = await _customerRepository.GetByEmailAsync(Email);
+            if (customer != null && customer.Orders.Any())
+            {
+                Orders = customer.Orders.OrderByDescending(o => o.OrderDate);
+            }
         }
         else
         {
             Orders = new List<Order>();
         }
-
-        await Task.CompletedTask;
     }
 }

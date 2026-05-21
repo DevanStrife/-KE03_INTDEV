@@ -7,12 +7,11 @@ namespace MatrixInc.Admin.Pages.Products;
 
 public class CreateModel : PageModel
 {
-    // Tijdelijk uitgeschakeld - database functionaliteit niet beschikbaar
-    // private readonly IProductRepository _productRepository;
+    private readonly IProductRepository _productRepository;
 
-    public CreateModel()
+    public CreateModel(IProductRepository productRepository)
     {
-        // _productRepository = productRepository;
+        _productRepository = productRepository;
     }
 
     [BindProperty]
@@ -24,9 +23,14 @@ public class CreateModel : PageModel
 
     public async Task<IActionResult> OnPostAsync()
     {
-        // Tijdelijk uitgeschakeld
-        await Task.CompletedTask;
-        TempData["WarningMessage"] = "Database functionaliteit is tijdelijk uitgeschakeld.";
+        if (!ModelState.IsValid)
+        {
+            return Page();
+        }
+
+        await _productRepository.AddAsync(Product);
+        TempData["SuccessMessage"] = "Product succesvol toegevoegd.";
+
         return RedirectToPage("Index");
     }
 }

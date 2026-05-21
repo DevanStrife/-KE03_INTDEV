@@ -33,6 +33,8 @@ public class CustomerRepository : ICustomerRepository
     {
         return await _context.Customers
             .Include(c => c.Orders)
+                .ThenInclude(o => o.OrderItems)
+                    .ThenInclude(oi => oi.Product)
             .FirstOrDefaultAsync(c => c.Email == email);
     }
 

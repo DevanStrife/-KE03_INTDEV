@@ -8,11 +8,11 @@ namespace MatrixInc.Web.Pages;
 
 public class OrderConfirmationModel : PageModel
 {
-    private readonly OrderService _orderService;
+    private readonly IOrderRepository _orderRepository;
 
-    public OrderConfirmationModel(OrderService orderService)
+    public OrderConfirmationModel(IOrderRepository orderRepository)
     {
-        _orderService = orderService;
+        _orderRepository = orderRepository;
     }
 
     public int OrderId { get; set; }
@@ -24,20 +24,20 @@ public class OrderConfirmationModel : PageModel
 
     public async Task<IActionResult> OnGetAsync(int orderId)
     {
-        // Probeer order uit OrderService te halen
-        Order = _orderService.GetOrderById(orderId);
+        // Haal order uit database
+        Order = await _orderRepository.GetByIdAsync(orderId);
 
         if (Order != null)
         {
             OrderId = Order.Id;
-            CustomerName = Order.Customer.Name;
-            CustomerEmail = Order.Customer.Email;
+            CustomerName = Order.Customer?.Name ?? "";
+            CustomerEmail = Order.Customer?.Email ?? "";
             OrderTotal = Order.TotalAmount;
             OrderItemCount = Order.OrderItems.Sum(oi => oi.Quantity);
         }
         else if (TempData["OrderId"] != null)
         {
-            // Fallback naar TempData
+            // Fallback naar TempData als order niet gevonden
             OrderId = (int)TempData["OrderId"]!;
             CustomerName = TempData["CustomerName"]?.ToString() ?? "";
             CustomerEmail = TempData["CustomerEmail"]?.ToString() ?? "";
@@ -49,15 +49,9 @@ public class OrderConfirmationModel : PageModel
         }
         else
         {
-            // Fallback als alles leeg is
-            OrderId = orderId;
-            CustomerName = "Demo Klant";
-            CustomerEmail = "demo@example.com";
-            OrderTotal = 0;
-            OrderItemCount = 0;
+            return RedirectToPage("/Index");
         }
 
-        await Task.CompletedTask;
         return Page();
     }
 }

@@ -7,12 +7,11 @@ namespace MatrixInc.Admin.Pages.Products;
 
 public class EditModel : PageModel
 {
-    // Tijdelijk uitgeschakeld - database functionaliteit niet beschikbaar
-    // private readonly IProductRepository _productRepository;
+    private readonly IProductRepository _productRepository;
 
-    public EditModel()
+    public EditModel(IProductRepository productRepository)
     {
-        // _productRepository = productRepository;
+        _productRepository = productRepository;
     }
 
     [BindProperty]
@@ -20,17 +19,27 @@ public class EditModel : PageModel
 
     public async Task<IActionResult> OnGetAsync(int id)
     {
-        // Tijdelijk uitgeschakeld
-        await Task.CompletedTask;
-        TempData["WarningMessage"] = "Database functionaliteit is tijdelijk uitgeschakeld.";
-        return RedirectToPage("Index");
+        var product = await _productRepository.GetByIdAsync(id);
+
+        if (product == null)
+        {
+            return NotFound();
+        }
+
+        Product = product;
+        return Page();
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
-        // Tijdelijk uitgeschakeld
-        await Task.CompletedTask;
-        TempData["WarningMessage"] = "Database functionaliteit is tijdelijk uitgeschakeld.";
+        if (!ModelState.IsValid)
+        {
+            return Page();
+        }
+
+        await _productRepository.UpdateAsync(Product);
+        TempData["SuccessMessage"] = "Product succesvol bijgewerkt.";
+
         return RedirectToPage("Index");
     }
 }

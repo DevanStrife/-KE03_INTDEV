@@ -12,11 +12,22 @@ public class CheckoutModel : PageModel
 {
     private readonly CartService _cartService;
     private readonly OrderService _orderService;
+    private readonly ICustomerRepository _customerRepository;
+    private readonly IOrderRepository _orderRepository;
+    private readonly IProductRepository _productRepository;
 
-    public CheckoutModel(CartService cartService, OrderService orderService)
+    public CheckoutModel(
+        CartService cartService, 
+        OrderService orderService,
+        ICustomerRepository customerRepository,
+        IOrderRepository orderRepository,
+        IProductRepository productRepository)
     {
         _cartService = cartService;
         _orderService = orderService;
+        _customerRepository = customerRepository;
+        _orderRepository = orderRepository;
+        _productRepository = productRepository;
     }
 
     [BindProperty]
@@ -76,66 +87,92 @@ public class CheckoutModel : PageModel
             return Page();
         }
 
-        // Simuleer bestelling - genereer een willekeurig order ID
-        var random = new Random();
-        var orderId = random.Next(1000, 9999);
-
-        // Maak een Order object aan
-        var customer = new Customer
+        try
         {
-            Id = random.Next(100, 999),
-            Name = CustomerName,
-            Email = CustomerEmail,
-            PhoneNumber = CustomerPhone,
-            Address = CustomerAddress,
-            CreatedDate = DateTime.Now
-        };
-
-        var order = new Order
-        {
-            Id = orderId,
-            Customer = customer,
-            CustomerId = customer.Id,
-            OrderDate = DateTime.Now,
-            Status = "In behandeling",
-            Notes = OrderNotes,
-            TotalAmount = Total,
-            OrderItems = new List<OrderItem>()
-        };
-
-        // Voeg order items toe
-        foreach (var cartItem in CartItems)
-        {
-            order.OrderItems.Add(new OrderItem
+            // Zoek of maak klant aan in database
+            var customer = await _customerRepository.GetByEmailAsync(CustomerEmail);
+            if (customer == null)
             {
-                Id = random.Next(1000, 9999),
-                OrderId = orderId,
-                ProductId = cartItem.ProductId,
-                Product = new Product 
-                { 
-                    Id = cartItem.ProductId, 
-                    Name = cartItem.ProductName,
-                    Price = cartItem.Price
-                },
-                Quantity = cartItem.Quantity,
-                UnitPrice = cartItem.Price
-            });
+                customer = new Customer
+                {
+                    Name = CustomerName,
+                    Email = CustomerEmail,
+                    PhoneNumber = CustomerPhone,
+                    Address = CustomerAddress,
+                    CreatedDate = DateTime.Now
+                };
+                await _customerRepository.AddAsync(customer);
+
+                // Haal de klant opnieuw op om de ID te krijgen
+                customer = await _customerRepository.GetByEmailAsync(CustomerEmail);
+                if (customer == null)
+                {
+                    TempData["ErrorMessage"] = "Er is een fout opgetreden bij het aanmaken van uw klantprofiel.";
+                    return Page();
+                }
+            }
+
+            // Valideer alle producten eerst
+            var productsToUpdate = new List<(Product product, int quantity)>();
+            foreach (var cartItem in CartItems)
+            {
+                var product = await _productRepository.GetByIdAsync(cartItem.ProductId);
+                if (product == null || product.StockQuantity < cartItem.Quantity)
+                {
+                    TempData["ErrorMessage"] = $"Product {cartItem.ProductName} is niet meer beschikbaar in de gevraagde hoeveelheid.";
+                    return Page();
+                }
+                productsToUpdate.Add((product, cartItem.Quantity));
+            }
+
+            // Maak order aan
+            var order = new Order
+            {
+                CustomerId = customer.Id,
+                OrderDate = DateTime.Now,
+                Status = "In behandeling",
+                Notes = OrderNotes,
+                TotalAmount = Total,
+                OrderItems = new List<OrderItem>()
+            };
+
+            // Voeg order items toe
+            foreach (var cartItem in CartItems)
+            {
+                order.OrderItems.Add(new OrderItem
+                {
+                    ProductId = cartItem.ProductId,
+                    Quantity = cartItem.Quantity,
+                    UnitPrice = cartItem.Price
+                });
+            }
+
+            // Sla order op in database
+            var orderId = await _orderRepository.CreateOrderAsync(order);
+
+            // Update voorraad na succesvolle order
+            foreach (var (product, quantity) in productsToUpdate)
+            {
+                product.StockQuantity -= quantity;
+                await _productRepository.UpdateAsync(product);
+            }
+
+            // Sla order gegevens op in TempData voor de bevestigingspagina
+            TempData["OrderId"] = orderId;
+            TempData["CustomerName"] = CustomerName;
+            TempData["CustomerEmail"] = CustomerEmail;
+            TempData["OrderTotal"] = Total.ToString("F2");
+            TempData["OrderItemCount"] = CartItems.Sum(c => c.Quantity);
+
+            // Leeg de winkelwagen
+            _cartService.ClearCart();
+
+            return RedirectToPage("/OrderConfirmation", new { orderId });
         }
-
-        // Sla order op in session
-        _orderService.AddOrder(order);
-
-        // Sla order gegevens op in TempData voor de bevestigingspagina
-        TempData["OrderId"] = orderId;
-        TempData["CustomerName"] = CustomerName;
-        TempData["CustomerEmail"] = CustomerEmail;
-        TempData["OrderTotal"] = Total.ToString("F2"); // Converteer decimal naar string
-        TempData["OrderItemCount"] = CartItems.Sum(c => c.Quantity);
-
-        // Leeg de winkelwagen
-        _cartService.ClearCart();
-
-        await Task.CompletedTask;
-        return RedirectToPage("/OrderConfirmation", new { orderId });
+        catch (Exception ex)
+        {
+            TempData["ErrorMessage"] = $"Er is een fout opgetreden bij het plaatsen van uw bestelling: {ex.Message}";
+            return Page();
+        }
     }
 }
