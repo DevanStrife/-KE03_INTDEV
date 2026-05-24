@@ -36,13 +36,13 @@
     </div>
 </div>
 
-<div class="row">
+<div class="row mb-5 pb-5">
     <div class="col-12">
         <h2 class="text-center mb-4">Onze Categorieën</h2>
     </div>
     @if (Model.Categories != null && Model.Categories.Any())
     {
-        <div class="col-12">
+        <div class="col-12 mb-5">
             <div class="d-flex flex-wrap justify-content-center gap-3">
                 @foreach (var category in Model.Categories)
                 {
