@@ -1,0 +1,99 @@
+@page
+@model MatrixInc.Admin.Pages.Customers.IndexModel
+@{
+    ViewData["Title"] = "Klanten Beheer";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="bi bi-people-fill"></i> Klanten Beheer</h1>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (Model.Customers.Any())
+    {
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Naam</th>
+                                <th>Email</th>
+                                <th>Telefoonnummer</th>
+                                <th>Adres</th>
+                                <th>Aantal Bestellingen</th>
+                                <th>Aangemaakt</th>
+                                <th>Acties</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var customer in Model.Customers)
+                            {
+                                <tr>
+                                    <td>@customer.Id</td>
+                                    <td>
+                                        <strong>@customer.Name</strong>
+                                    </td>
+                                    <td>
+                                        <a href="mailto:@customer.Email">
+                                            <i class="bi bi-envelope"></i> @customer.Email
+                                        </a>
+                                    </td>
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(customer.PhoneNumber))
+                                        {
+                                            <i class="bi bi-telephone"></i> @customer.PhoneNumber
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">-</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(customer.Address))
+                                        {
+                                            @customer.Address
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">-</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-primary">@customer.Orders.Count</span>
+                                    </td>
+                                    <td>@customer.CreatedDate.ToString("dd-MM-yyyy")</td>
+                                    <td>
+                                        <a asp-page="/Customers/Details" asp-route-id="@customer.Id" 
+                                           class="btn btn-sm btn-info" title="Bekijk details">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-3">
+            <p class="text-muted">Totaal aantal klanten: <strong>@Model.Customers.Count()</strong></p>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i> Nog geen klanten in het systeem.
+        </div>
+    }
+</div>

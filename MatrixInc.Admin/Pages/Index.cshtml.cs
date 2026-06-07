@@ -6,31 +6,36 @@ namespace MatrixInc.Admin.Pages;
 
 public class IndexModel : PageModel
 {
-    // Tijdelijk uitgeschakeld - database functionaliteit niet beschikbaar
-    // private readonly IProductRepository _productRepository;
-    // private readonly ICustomerRepository _customerRepository;
-    // private readonly IOrderRepository _orderRepository;
+    private readonly IProductRepository _productRepository;
+    private readonly ICustomerRepository _customerRepository;
+    private readonly IOrderRepository _orderRepository;
 
-    public IndexModel()
+    public IndexModel(
+        IProductRepository productRepository,
+        ICustomerRepository customerRepository,
+        IOrderRepository orderRepository)
     {
-        // _productRepository = productRepository;
-        // _customerRepository = customerRepository;
-        // _orderRepository = orderRepository;
+        _productRepository = productRepository;
+        _customerRepository = customerRepository;
+        _orderRepository = orderRepository;
     }
 
     public int TotalProducts { get; set; }
     public int TotalOrders { get; set; }
     public int TotalCustomers { get; set; }
+    public decimal TotalRevenue { get; set; }
     public IEnumerable<Order> RecentOrders { get; set; } = new List<Order>();
 
     public async Task OnGetAsync()
     {
-        // Dummy dashboard statistieken
-        TotalProducts = 20;
-        TotalCustomers = 15;
-        TotalOrders = 42;
-        RecentOrders = new List<Order>();
+        var products = await _productRepository.GetAllAsync();
+        var customers = await _customerRepository.GetAllAsync();
+        var orders = await _orderRepository.GetAllAsync();
 
-        await Task.CompletedTask;
+        TotalProducts = products.Count();
+        TotalCustomers = customers.Count();
+        TotalOrders = orders.Count();
+        TotalRevenue = orders.Sum(o => o.TotalAmount);
+        RecentOrders = orders.OrderByDescending(o => o.OrderDate).Take(5);
     }
 }

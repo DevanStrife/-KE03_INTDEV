@@ -1,0 +1,224 @@
+@page
+@model MatrixInc.Admin.Pages.Orders.DetailsModel
+@{
+    ViewData["Title"] = "Bestelling Details";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="bi bi-receipt"></i> Bestelling #@Model.Order.Id</h1>
+        <a asp-page="./Index" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Terug naar overzicht
+        </a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm mb-3">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-person-vcard"></i> Klantgegevens</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.Order.Customer != null)
+                    {
+                        <dl class="row mb-0">
+                            <dt class="col-sm-4">Naam:</dt>
+                            <dd class="col-sm-8">
+                                <strong>@Model.Order.Customer.Name</strong>
+                            </dd>
+
+                            <dt class="col-sm-4">Email:</dt>
+                            <dd class="col-sm-8">
+                                <a href="mailto:@Model.Order.Customer.Email">@Model.Order.Customer.Email</a>
+                            </dd>
+
+                            <dt class="col-sm-4">Telefoon:</dt>
+                            <dd class="col-sm-8">
+                                @if (!string.IsNullOrEmpty(Model.Order.Customer.PhoneNumber))
+                                {
+                                    @Model.Order.Customer.PhoneNumber
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Niet opgegeven</span>
+                                }
+                            </dd>
+
+                            <dt class="col-sm-4">Adres:</dt>
+                            <dd class="col-sm-8">
+                                @if (!string.IsNullOrEmpty(Model.Order.Customer.Address))
+                                {
+                                    @Model.Order.Customer.Address
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Niet opgegeven</span>
+                                }
+                            </dd>
+                        </dl>
+                        <hr />
+                        <a asp-page="/Customers/Details" asp-route-id="@Model.Order.Customer.Id" 
+                           class="btn btn-sm btn-outline-primary w-100">
+                            <i class="bi bi-person-circle"></i> Bekijk klantprofiel
+                        </a>
+                    }
+                    else
+                    {
+                        <p class="text-muted mb-0">Klantgegevens niet beschikbaar</p>
+                    }
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="bi bi-info-circle"></i> Bestelgegevens</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-5">Order ID:</dt>
+                        <dd class="col-sm-7"><strong>#@Model.Order.Id</strong></dd>
+
+                        <dt class="col-sm-5">Datum:</dt>
+                        <dd class="col-sm-7">@Model.Order.OrderDate.ToString("dd MMMM yyyy")<br />
+                            <small class="text-muted">@Model.Order.OrderDate.ToString("HH:mm")</small>
+                        </dd>
+
+                        <dt class="col-sm-5">Status:</dt>
+                        <dd class="col-sm-7">
+                            @if (Model.Order.Status == "In behandeling")
+                            {
+                                <span class="badge bg-warning text-dark">@Model.Order.Status</span>
+                            }
+                            else if (Model.Order.Status == "Verzonden")
+                            {
+                                <span class="badge bg-info">@Model.Order.Status</span>
+                            }
+                            else if (Model.Order.Status == "Afgeleverd")
+                            {
+                                <span class="badge bg-success">@Model.Order.Status</span>
+                            }
+                            else if (Model.Order.Status == "Geannuleerd")
+                            {
+                                <span class="badge bg-danger">@Model.Order.Status</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">@Model.Order.Status</span>
+                            }
+                        </dd>
+
+                        <dt class="col-sm-5">Totaal:</dt>
+                        <dd class="col-sm-7"><h4 class="text-success mb-0">€@Model.Order.TotalAmount.ToString("F2")</h4></dd>
+                    </dl>
+
+                    @if (!string.IsNullOrEmpty(Model.Order.Notes))
+                    {
+                        <hr />
+                        <dt>Opmerkingen:</dt>
+                        <dd class="mb-0">@Model.Order.Notes</dd>
+                    }
+                </div>
+            </div>
+
+            <div class="card shadow-sm mt-3">
+                <div class="card-header bg-warning">
+                    <h5 class="mb-0"><i class="bi bi-pencil-square"></i> Status Bijwerken</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" asp-page-handler="UpdateStatus" asp-route-id="@Model.Order.Id">
+                        <div class="mb-3">
+                            <label asp-for="NewStatus" class="form-label">Nieuwe Status</label>
+                            <select asp-for="NewStatus" class="form-select">
+                                <option value="In behandeling">In behandeling</option>
+                                <option value="Verzonden">Verzonden</option>
+                                <option value="Afgeleverd">Afgeleverd</option>
+                                <option value="Geannuleerd">Geannuleerd</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-check-circle"></i> Status Bijwerken
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-cart"></i> Bestelde Producten 
+                        <span class="badge bg-light text-dark">@Model.Order.OrderItems.Count</span>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.Order.OrderItems.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Product</th>
+                                        <th class="text-center">Aantal</th>
+                                        <th class="text-end">Prijs</th>
+                                        <th class="text-end">Subtotaal</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model.Order.OrderItems)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <strong>@item.Product?.Name</strong>
+                                                @if (item.Product != null && !string.IsNullOrEmpty(item.Product.Description))
+                                                {
+                                                    <br />
+                                                    <small class="text-muted">@item.Product.Description</small>
+                                                }
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="badge bg-primary">@item.Quantity</span>
+                                            </td>
+                                            <td class="text-end">€@item.UnitPrice.ToString("F2")</td>
+                                            <td class="text-end">
+                                                <strong>€@((item.Quantity * item.UnitPrice).ToString("F2"))</strong>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                                <tfoot class="table-light">
+                                    <tr>
+                                        <td colspan="3" class="text-end"><strong>Totaal Items:</strong></td>
+                                        <td class="text-end">
+                                            <span class="badge bg-primary">@Model.Order.OrderItems.Sum(oi => oi.Quantity)</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="3" class="text-end"><h5 class="mb-0">Totaalbedrag:</h5></td>
+                                        <td class="text-end">
+                                            <h4 class="text-success mb-0">€@Model.Order.TotalAmount.ToString("F2")</h4>
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning mb-0">
+                            <i class="bi bi-exclamation-triangle"></i> Geen producten gevonden in deze bestelling.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
