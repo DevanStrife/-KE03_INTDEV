@@ -1,4 +1,4 @@
-using MatrixInc.DataAccess.Models;
+using MatrixInc.Courier.Services;
 
 namespace MatrixInc.Courier.Models;
 
@@ -14,9 +14,9 @@ public class DeliveryOrder
     public int ItemCount { get; set; }
     public string StatusColor { get; set; } = "#FFC107"; // Geel voor "In behandeling"
 
-    public static DeliveryOrder FromOrder(Order order)
+    public static DeliveryOrder FromApiDto(ApiOrderDto dto)
     {
-        var statusColor = order.Status switch
+        var statusColor = dto.Status switch
         {
             "In behandeling" => "#FFC107", // Geel/Amber
             "Verzonden" => "#2196F3",      // Blauw
@@ -27,14 +27,14 @@ public class DeliveryOrder
 
         return new DeliveryOrder
         {
-            OrderId = order.Id,
-            CustomerName = order.Customer?.Name ?? "Onbekend",
-            CustomerAddress = order.Customer?.Address ?? "Geen adres",
-            CustomerPhone = order.Customer?.PhoneNumber ?? "Geen telefoon",
-            OrderDate = order.OrderDate,
-            Status = order.Status,
-            TotalAmount = order.TotalAmount,
-            ItemCount = order.OrderItems?.Sum(oi => oi.Quantity) ?? 0,
+            OrderId = dto.Id,
+            CustomerName = dto.CustomerName,
+            CustomerAddress = dto.CustomerAddress,
+            CustomerPhone = dto.CustomerPhone,
+            OrderDate = dto.OrderDate,
+            Status = dto.Status,
+            TotalAmount = dto.TotalAmount,
+            ItemCount = dto.OrderItems?.Sum(oi => oi.Quantity) ?? 0,
             StatusColor = statusColor
         };
     }

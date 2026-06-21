@@ -1,52 +1,94 @@
 using MatrixInc.Courier.Models;
-using MatrixInc.DataAccess.Repositories;
+using System.Net.Http.Json;
+using System.Text;
+using System.Text.Json;
 
 namespace MatrixInc.Courier.Services;
 
 public class CourierOrderService
 {
-    private readonly IOrderRepository _orderRepository;
+    private readonly HttpClient _httpClient;
+    private readonly string _baseUrl;
 
-    public CourierOrderService(IOrderRepository orderRepository)
+    public CourierOrderService(HttpClient httpClient)
     {
-        _orderRepository = orderRepository;
+        _httpClient = httpClient;
+        // TODO: Pas dit aan naar je laptop's IP adres wanneer je op een echte telefoon test
+        // Gebruik localhost voor Windows emulator
+        _baseUrl = "https://localhost:7120/api"; // Pas poort aan indien nodig
     }
 
     public async Task<List<DeliveryOrder>> GetPendingDeliveriesAsync()
     {
-        var orders = await _orderRepository.GetAllAsync();
-
-        return orders
-            .Where(o => o.Status == "In behandeling" || o.Status == "Verzonden")
-            .OrderBy(o => o.OrderDate)
-            .Select(DeliveryOrder.FromOrder)
-            .ToList();
+        try
+        {
+            var orders = await _httpClient.GetFromJsonAsync<List<ApiOrderDto>>($"{_baseUrl}/orders/pending");
+            return orders?.Select(DeliveryOrder.FromApiDto).ToList() ?? new List<DeliveryOrder>();
+        }
+        catch (Exception ex)
+        {
+            // Log error
+            Console.WriteLine($"Error getting pending deliveries: {ex.Message}");
+            return new List<DeliveryOrder>();
+        }
     }
 
     public async Task<List<DeliveryOrder>> GetAllDeliveriesAsync()
     {
-        var orders = await _orderRepository.GetAllAsync();
-
-        return orders
-            .OrderByDescending(o => o.OrderDate)
-            .Select(DeliveryOrder.FromOrder)
-            .ToList();
+        try
+        {
+            var orders = await _httpClient.GetFromJsonAsync<List<ApiOrderDto>>($"{_baseUrl}/orders");
+            return orders?.Select(DeliveryOrder.FromApiDto).ToList() ?? new List<DeliveryOrder>();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error getting all deliveries: {ex.Message}");
+            return new List<DeliveryOrder>();
+        }
     }
 
     public async Task<bool> UpdateOrderStatusAsync(int orderId, string newStatus)
     {
         try
         {
-            var order = await _orderRepository.GetByIdAsync(orderId);
-            if (order == null) return false;
+            var content = new StringContent(
+                JsonSerializer.Serialize(new { Status = newStatus }),
+                Encoding.UTF8,
+                "application/json"
+            );
 
-            order.Status = newStatus;
-            await _orderRepository.UpdateAsync(order);
-            return true;
+            var response = await _httpClient.PutAsync($"{_baseUrl}/orders/{orderId}/status", content);
+            return response.IsSuccessStatusCode;
         }
-        catch
+        catch (Exception ex)
         {
+            Console.WriteLine($"Error updating order status: {ex.Message}");
             return false;
         }
     }
+}
+
+// DTO classes die matchen met de API
+public class ApiOrderDto
+{
+    public int Id { get; set; }
+    public int CustomerId { get; set; }
+    public string CustomerName { get; set; } = string.Empty;
+    public string CustomerEmail { get; set; } = string.Empty;
+    public string CustomerPhone { get; set; } = string.Empty;
+    public string CustomerAddress { get; set; } = string.Empty;
+    public DateTime OrderDate { get; set; }
+    public string Status { get; set; } = string.Empty;
+    public decimal TotalAmount { get; set; }
+    public string? Notes { get; set; }
+    public List<ApiOrderItemDto> OrderItems { get; set; } = new();
+}
+
+public class ApiOrderItemDto
+{
+    public int Id { get; set; }
+    public int ProductId { get; set; }
+    public string ProductName { get; set; } = string.Empty;
+    public int Quantity { get; set; }
+    public decimal UnitPrice { get; set; }
 }
