@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using MatrixInc.Courier.Services;
 using MatrixInc.Courier.Pages;
+using Plugin.LocalNotification;
 
 namespace MatrixInc.Courier;
 
@@ -11,6 +12,7 @@ public static class MauiProgram
 		var builder = MauiApp.CreateBuilder();
 		builder
 			.UseMauiApp<App>()
+			.UseLocalNotification() // Voeg notification support toe
 			.ConfigureFonts(fonts =>
 			{
 				fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
@@ -34,6 +36,8 @@ public static class MauiProgram
 
 		// Services
 		builder.Services.AddSingleton<CourierOrderService>();
+		builder.Services.AddSingleton<NotificationService>();
+		builder.Services.AddSingleton<LocationService>();
 
 		// Pages
 		builder.Services.AddTransient<OrdersPage>();
