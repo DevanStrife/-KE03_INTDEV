@@ -13,9 +13,10 @@ public class CourierOrderService
     public CourierOrderService(HttpClient httpClient)
     {
         _httpClient = httpClient;
-        // TODO: Pas dit aan naar je laptop's IP adres wanneer je op een echte telefoon test
-        // Gebruik localhost voor Windows emulator
-        _baseUrl = "https://localhost:7120/api"; // Pas poort aan indien nodig
+        // Gebruik het IP-adres van je laptop op het WiFi netwerk
+        // 10.12.106.189 = laptop's WiFi IP
+        // Poort 5102 = HTTP API poort (geen SSL problemen)
+        _baseUrl = "http://10.12.106.189:5102/api";
     }
 
     public async Task<List<DeliveryOrder>> GetPendingDeliveriesAsync()

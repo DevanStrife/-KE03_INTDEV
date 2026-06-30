@@ -62,10 +62,13 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.UseHttpsRedirection();
+// HTTPS redirect uitgeschakeld voor mobile development
+// app.UseHttpsRedirection();
+
 app.UseCors("AllowAll");
 app.UseAuthorization();
 app.MapControllers();
 
-app.Run();
+// Luister op alle netwerk interfaces zodat telefoon kan verbinden
+app.Run("http://0.0.0.0:5102");
 
