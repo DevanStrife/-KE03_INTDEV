@@ -13,6 +13,13 @@ public class OrderDto
     public decimal TotalAmount { get; set; }
     public string? Notes { get; set; }
     public List<OrderItemDto> OrderItems { get; set; } = new();
+
+    // Adres details voor navigatie in courier app
+    public string? Street { get; set; }
+    public string? HouseNumber { get; set; }
+    public string? City { get; set; }
+    public string? PostalCode { get; set; }
+    public string? Province { get; set; }
 }
 
 public class OrderItemDto

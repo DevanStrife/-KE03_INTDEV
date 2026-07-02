@@ -15,19 +15,22 @@ public class CheckoutModel : PageModel
     private readonly ICustomerRepository _customerRepository;
     private readonly IOrderRepository _orderRepository;
     private readonly IProductRepository _productRepository;
+    private readonly IAddressRepository _addressRepository;
 
     public CheckoutModel(
         CartService cartService, 
         OrderService orderService,
         ICustomerRepository customerRepository,
         IOrderRepository orderRepository,
-        IProductRepository productRepository)
+        IProductRepository productRepository,
+        IAddressRepository addressRepository)
     {
         _cartService = cartService;
         _orderService = orderService;
         _customerRepository = customerRepository;
         _orderRepository = orderRepository;
         _productRepository = productRepository;
+        _addressRepository = addressRepository;
     }
 
     [BindProperty]
@@ -47,9 +50,34 @@ public class CheckoutModel : PageModel
     public string? CustomerPhone { get; set; }
 
     [BindProperty]
-    [Required(ErrorMessage = "Adres is verplicht")]
-    [Display(Name = "Adres")]
-    public string CustomerAddress { get; set; } = string.Empty;
+    [Required(ErrorMessage = "Straat is verplicht")]
+    [Display(Name = "Straat")]
+    public string Street { get; set; } = string.Empty;
+
+    [BindProperty]
+    [Required(ErrorMessage = "Huisnummer is verplicht")]
+    [Display(Name = "Huisnummer")]
+    public string HouseNumber { get; set; } = string.Empty;
+
+    [BindProperty]
+    [Display(Name = "Toevoeging")]
+    public string? ApartmentNumber { get; set; }
+
+    [BindProperty]
+    [Required(ErrorMessage = "Postcode is verplicht")]
+    [Display(Name = "Postcode")]
+    [RegularExpression(@"^\d{4}\s?[A-Z]{2}$", ErrorMessage = "Voer een geldige Nederlandse postcode in (bijv. 1234 AB)")]
+    public string PostalCode { get; set; } = string.Empty;
+
+    [BindProperty]
+    [Required(ErrorMessage = "Plaats is verplicht")]
+    [Display(Name = "Plaats")]
+    public string City { get; set; } = string.Empty;
+
+    [BindProperty]
+    [Required(ErrorMessage = "Provincie is verplicht")]
+    [Display(Name = "Provincie")]
+    public string Province { get; set; } = string.Empty;
 
     [BindProperty]
     [Display(Name = "Opmerkingen")]
@@ -93,12 +121,25 @@ public class CheckoutModel : PageModel
             var customer = await _customerRepository.GetByEmailAsync(CustomerEmail);
             if (customer == null)
             {
+                // Maak eerst het adres aan
+                var address = new Address
+                {
+                    Street = Street,
+                    HouseNumber = HouseNumber,
+                    ApartmentNumber = ApartmentNumber,
+                    PostalCode = PostalCode,
+                    City = City,
+                    Country = Province // Provincie wordt opgeslagen als Country voor nu
+                };
+                var addressId = await _addressRepository.AddAsync(address);
+
+                // Maak nieuwe klant aan met het nieuwe adres
                 customer = new Customer
                 {
                     Name = CustomerName,
                     Email = CustomerEmail,
                     PhoneNumber = CustomerPhone,
-                    Address = CustomerAddress,
+                    AddressId = addressId,
                     CreatedDate = DateTime.Now
                 };
                 await _customerRepository.AddAsync(customer);
@@ -110,6 +151,22 @@ public class CheckoutModel : PageModel
                     TempData["ErrorMessage"] = "Er is een fout opgetreden bij het aanmaken van uw klantprofiel.";
                     return Page();
                 }
+            }
+            else if (customer.AddressId == null)
+            {
+                // Bestaande klant zonder adres - voeg adres toe
+                var address = new Address
+                {
+                    Street = Street,
+                    HouseNumber = HouseNumber,
+                    ApartmentNumber = ApartmentNumber,
+                    PostalCode = PostalCode,
+                    City = City,
+                    Country = Province
+                };
+                var addressId = await _addressRepository.AddAsync(address);
+                customer.AddressId = addressId;
+                await _customerRepository.UpdateAsync(customer);
             }
 
             // Valideer alle producten eerst

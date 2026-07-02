@@ -13,10 +13,10 @@ public class CourierOrderService
     public CourierOrderService(HttpClient httpClient)
     {
         _httpClient = httpClient;
-        // Gebruik het IP-adres van je laptop op het WiFi netwerk
-        // 10.12.106.189 = laptop's WiFi IP
+        // Gebruik het IP-adres van je laptop op het WiFi/hotspot netwerk
+        // 10.223.128.31 = laptop's huidige WiFi/hotspot IP
         // Poort 5102 = HTTP API poort (geen SSL problemen)
-        _baseUrl = "http://10.12.106.189:5102/api";
+        _baseUrl = "http://10.223.128.31:5102/api";
     }
 
     public async Task<List<DeliveryOrder>> GetPendingDeliveriesAsync()
@@ -83,6 +83,13 @@ public class ApiOrderDto
     public decimal TotalAmount { get; set; }
     public string? Notes { get; set; }
     public List<ApiOrderItemDto> OrderItems { get; set; } = new();
+
+    // Adres details voor navigatie
+    public string? Street { get; set; }
+    public string? HouseNumber { get; set; }
+    public string? City { get; set; }
+    public string? PostalCode { get; set; }
+    public string? Province { get; set; }
 }
 
 public class ApiOrderItemDto

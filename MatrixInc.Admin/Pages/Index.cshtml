@@ -4,6 +4,19 @@
     ViewData["Title"] = "Admin Dashboard";
 }
 
+@{
+    var adminUser = HttpContext.Session.GetString("AdminUser");
+    var adminRole = HttpContext.Session.GetString("AdminRole");
+}
+
+@if (!string.IsNullOrEmpty(adminUser))
+{
+    <div class="alert alert-info alert-dismissible fade show mb-4">
+        <i class="bi bi-person-badge"></i> <strong>Welkom, @adminUser!</strong> U bent ingelogd als @adminRole.
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
 <div class="text-center mb-5">
     <h1 class="display-4">
         <i class="bi bi-speedometer2"></i> Admin Dashboard

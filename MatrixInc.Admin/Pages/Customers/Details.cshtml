@@ -45,9 +45,13 @@
 
                         <dt class="col-sm-4">Adres:</dt>
                         <dd class="col-sm-8">
-                            @if (!string.IsNullOrEmpty(Model.Customer.Address))
+                            @if (Model.Customer.Address != null)
                             {
-                                @Model.Customer.Address
+                                @Model.Customer.Address.FullAddress
+                            }
+                            else if (!string.IsNullOrEmpty(Model.Customer.AddressOld))
+                            {
+                                @Model.Customer.AddressOld
                             }
                             else
                             {

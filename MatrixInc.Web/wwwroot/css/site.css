@@ -63,6 +63,26 @@ body {
     min-width: 1.5em;
 }
 
+/* Account dropdown styling - voorkom vervaging */
+.navbar .dropdown .nav-link,
+.navbar .dropdown .nav-link.dropdown-toggle {
+    opacity: 1 !important;
+    color: rgba(255, 255, 255, 0.95) !important;
+}
+
+.navbar .dropdown .nav-link:hover,
+.navbar .dropdown .nav-link.dropdown-toggle:hover,
+.navbar .dropdown .nav-link:focus,
+.navbar .dropdown .nav-link.dropdown-toggle:focus {
+    opacity: 1 !important;
+    color: rgba(255, 255, 255, 1) !important;
+}
+
+.navbar .dropdown.show .nav-link.dropdown-toggle {
+    opacity: 1 !important;
+    color: rgba(255, 255, 255, 1) !important;
+}
+
 .footer {
     background-color: #f8f9fa;
 }

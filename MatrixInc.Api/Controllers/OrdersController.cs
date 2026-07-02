@@ -33,7 +33,12 @@ public class OrdersController : ControllerBase
                 CustomerName = o.Customer?.Name ?? "Onbekend",
                 CustomerEmail = o.Customer?.Email ?? "",
                 CustomerPhone = o.Customer?.PhoneNumber ?? "",
-                CustomerAddress = o.Customer?.Address ?? "",
+                CustomerAddress = o.Customer?.Address?.FullAddress ?? "Geen adres",
+                Street = o.Customer?.Address?.Street ?? "",
+                HouseNumber = o.Customer?.Address?.HouseNumber ?? "",
+                City = o.Customer?.Address?.City ?? "",
+                PostalCode = o.Customer?.Address?.PostalCode ?? "",
+                Province = o.Customer?.Address?.Province ?? "",
                 OrderDate = o.OrderDate,
                 Status = o.Status,
                 TotalAmount = o.TotalAmount,
@@ -53,12 +58,12 @@ public class OrdersController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error getting all orders");
-            return StatusCode(500, "Er is een fout opgetreden bij het ophalen van bestellingen");
+            return StatusCode(500, $"Er is een fout opgetreden bij het ophalen van bestellingen: {ex.Message}");
         }
     }
 
     /// <summary>
-    /// Haal alleen bestellingen op die verzonden moeten worden (In behandeling en Verzonden)
+    /// Haal alleen bestellingen op die klaar zijn voor levering of onderweg zijn (voor courier app)
     /// </summary>
     [HttpGet("pending")]
     public async Task<ActionResult<IEnumerable<OrderDto>>> GetPendingOrders()
@@ -67,7 +72,7 @@ public class OrdersController : ControllerBase
         {
             var orders = await _orderRepository.GetAllAsync();
             var pendingOrders = orders
-                .Where(o => o.Status == "In behandeling" || o.Status == "Verzonden")
+                .Where(o => o.Status == "Klaar voor Levering" || o.Status == "Onderweg")
                 .Select(o => new OrderDto
                 {
                     Id = o.Id,
@@ -75,7 +80,12 @@ public class OrdersController : ControllerBase
                     CustomerName = o.Customer?.Name ?? "Onbekend",
                     CustomerEmail = o.Customer?.Email ?? "",
                     CustomerPhone = o.Customer?.PhoneNumber ?? "",
-                    CustomerAddress = o.Customer?.Address ?? "",
+                    CustomerAddress = o.Customer?.Address?.FullAddress ?? "Geen adres",
+                    Street = o.Customer?.Address?.Street ?? "",
+                    HouseNumber = o.Customer?.Address?.HouseNumber ?? "",
+                    City = o.Customer?.Address?.City ?? "",
+                    PostalCode = o.Customer?.Address?.PostalCode ?? "",
+                    Province = o.Customer?.Address?.Province ?? "",
                     OrderDate = o.OrderDate,
                     Status = o.Status,
                     TotalAmount = o.TotalAmount,
@@ -121,7 +131,7 @@ public class OrdersController : ControllerBase
                 CustomerName = order.Customer?.Name ?? "Onbekend",
                 CustomerEmail = order.Customer?.Email ?? "",
                 CustomerPhone = order.Customer?.PhoneNumber ?? "",
-                CustomerAddress = order.Customer?.Address ?? "",
+                CustomerAddress = order.Customer?.Address?.FullAddress ?? order.Customer?.AddressOld ?? "Geen adres",
                 OrderDate = order.OrderDate,
                 Status = order.Status,
                 TotalAmount = order.TotalAmount,
@@ -161,7 +171,7 @@ public class OrdersController : ControllerBase
             }
 
             // Valideer status
-            var validStatuses = new[] { "In behandeling", "Verzonden", "Afgeleverd", "Geannuleerd" };
+            var validStatuses = new[] { "In behandeling", "Verzonden", "Afgeleverd", "Geannuleerd", "Klaar voor Levering", "Onderweg" };
             if (!validStatuses.Contains(dto.Status))
             {
                 return BadRequest($"Ongeldige status. Geldige waarden: {string.Join(", ", validStatuses)}");

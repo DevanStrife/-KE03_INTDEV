@@ -6,7 +6,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container
 builder.Services.AddControllers();
-builder.Services.AddOpenApi();
+
+// Add Swagger/OpenAPI support
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 // CORS - Allow alle origins voor development (pas dit aan voor productie!)
 builder.Services.AddCors(options =>
@@ -59,7 +62,12 @@ using (var scope = app.Services.CreateScope())
 // Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Matrix Inc API v1");
+        c.RoutePrefix = string.Empty; // Swagger UI op root
+    });
 }
 
 // HTTPS redirect uitgeschakeld voor mobile development

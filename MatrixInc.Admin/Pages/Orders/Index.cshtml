@@ -17,6 +17,47 @@
         </div>
     }
 
+    <!-- Filter Section -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Status Filter</label>
+                    <select name="statusFilter" class="form-select" onchange="this.form.submit()">
+                        <option value="">Alle Statussen</option>
+                        <option value="In Bewerking" selected="@(Model.StatusFilter == "In Bewerking")">In Bewerking</option>
+                        <option value="Klaar aan het Maken" selected="@(Model.StatusFilter == "Klaar aan het Maken")">Klaar aan het Maken</option>
+                        <option value="Klaar voor Levering" selected="@(Model.StatusFilter == "Klaar voor Levering")">Klaar voor Levering</option>
+                        <option value="Onderweg" selected="@(Model.StatusFilter == "Onderweg")">Onderweg</option>
+                        <option value="Afgeleverd" selected="@(Model.StatusFilter == "Afgeleverd")">Afgeleverd</option>
+                        <option value="Geannuleerd" selected="@(Model.StatusFilter == "Geannuleerd")">Geannuleerd</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Zoek op Klant</label>
+                    <input type="text" name="customerSearch" class="form-control" placeholder="Naam of email..." value="@Model.CustomerSearch" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Sorteer op</label>
+                    <select name="sortBy" class="form-select" onchange="this.form.submit()">
+                        <option value="date_desc" selected="@(Model.SortBy == "date_desc")">Nieuwste eerst</option>
+                        <option value="date_asc" selected="@(Model.SortBy == "date_asc")">Oudste eerst</option>
+                        <option value="amount_desc" selected="@(Model.SortBy == "amount_desc")">Hoogste bedrag</option>
+                        <option value="amount_asc" selected="@(Model.SortBy == "amount_asc")">Laagste bedrag</option>
+                    </select>
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-funnel"></i> Filter Toepassen
+                    </button>
+                    <a asp-page="./Index" class="btn btn-secondary">
+                        <i class="bi bi-x-circle"></i> Reset Filters
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
     @if (Model.Orders.Any())
     {
         <div class="row mb-4">
@@ -31,8 +72,16 @@
             <div class="col-md-3">
                 <div class="card shadow-sm">
                     <div class="card-body text-center">
-                        <h6 class="text-muted mb-2">In Behandeling</h6>
-                        <h3 class="mb-0 text-warning">@Model.Orders.Count(o => o.Status == "In behandeling")</h3>
+                        <h6 class="text-muted mb-2">In Bewerking</h6>
+                        <h3 class="mb-0 text-warning">@Model.Orders.Count(o => o.Status == "In Bewerking")</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card shadow-sm">
+                    <div class="card-body text-center">
+                        <h6 class="text-muted mb-2">Klaar voor Levering</h6>
+                        <h3 class="mb-0 text-info">@Model.Orders.Count(o => o.Status == "Klaar voor Levering")</h3>
                     </div>
                 </div>
             </div>
@@ -41,14 +90,6 @@
                     <div class="card-body text-center">
                         <h6 class="text-muted mb-2">Totale Omzet</h6>
                         <h3 class="mb-0 text-success">€@Model.Orders.Sum(o => o.TotalAmount).ToString("F2")</h3>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card shadow-sm">
-                    <div class="card-body text-center">
-                        <h6 class="text-muted mb-2">Gem. Bestelwaarde</h6>
-                        <h3 class="mb-0 text-info">€@Model.Orders.Average(o => o.TotalAmount).ToString("F2")</h3>
                     </div>
                 </div>
             </div>

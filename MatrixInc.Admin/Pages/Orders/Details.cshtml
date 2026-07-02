@@ -54,9 +54,13 @@
 
                             <dt class="col-sm-4">Adres:</dt>
                             <dd class="col-sm-8">
-                                @if (!string.IsNullOrEmpty(Model.Order.Customer.Address))
+                                @if (Model.Order.Customer.Address != null)
                                 {
-                                    @Model.Order.Customer.Address
+                                    @Model.Order.Customer.Address.FullAddress
+                                }
+                                else if (!string.IsNullOrEmpty(Model.Order.Customer.AddressOld))
+                                {
+                                    @Model.Order.Customer.AddressOld
                                 }
                                 else
                                 {
@@ -93,26 +97,19 @@
 
                         <dt class="col-sm-5">Status:</dt>
                         <dd class="col-sm-7">
-                            @if (Model.Order.Status == "In behandeling")
-                            {
-                                <span class="badge bg-warning text-dark">@Model.Order.Status</span>
+                            @{
+                                var statusClass = Model.Order.Status switch
+                                {
+                                    "In Bewerking" => "bg-warning text-dark",
+                                    "Klaar aan het Maken" => "bg-info",
+                                    "Klaar voor Levering" => "bg-primary",
+                                    "Onderweg" => "bg-info",
+                                    "Afgeleverd" => "bg-success",
+                                    "Geannuleerd" => "bg-danger",
+                                    _ => "bg-secondary"
+                                };
                             }
-                            else if (Model.Order.Status == "Verzonden")
-                            {
-                                <span class="badge bg-info">@Model.Order.Status</span>
-                            }
-                            else if (Model.Order.Status == "Afgeleverd")
-                            {
-                                <span class="badge bg-success">@Model.Order.Status</span>
-                            }
-                            else if (Model.Order.Status == "Geannuleerd")
-                            {
-                                <span class="badge bg-danger">@Model.Order.Status</span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-secondary">@Model.Order.Status</span>
-                            }
+                            <span class="badge @statusClass">@Model.Order.Status</span>
                         </dd>
 
                         <dt class="col-sm-5">Totaal:</dt>
@@ -130,21 +127,52 @@
 
             <div class="card shadow-sm mt-3">
                 <div class="card-header bg-warning">
-                    <h5 class="mb-0"><i class="bi bi-pencil-square"></i> Status Bijwerken</h5>
+                    <h5 class="mb-0"><i class="bi bi-gear"></i> Order Acties</h5>
                 </div>
                 <div class="card-body">
+                    <!-- Print Label Button -->
+                    <form method="post" asp-page-handler="PrintLabel" asp-route-id="@Model.Order.Id" class="mb-3">
+                        @{
+                            var canPrint = Model.Order.Status != "Afgeleverd" && Model.Order.Status != "Geannuleerd";
+                            var printButtonClass = canPrint ? "btn btn-success w-100" : "btn btn-secondary w-100";
+                        }
+                        <button type="submit" class="@printButtonClass" @(canPrint ? "" : "disabled")>
+                            <i class="bi bi-printer"></i> Print Verzendlabel (Simulatie)
+                        </button>
+                        @if (canPrint)
+                        {
+                            <small class="text-muted d-block mt-2">
+                                <i class="bi bi-info-circle"></i> Simuleer het printen van een verzendlabel
+                            </small>
+                        }
+                        else
+                        {
+                            <small class="text-muted d-block mt-2">
+                                <i class="bi bi-x-circle"></i> Bestelling is @Model.Order.Status.ToLower()
+                            </small>
+                        }
+                    </form>
+
+                    <hr />
+
+                    <!-- Status Update Form -->
                     <form method="post" asp-page-handler="UpdateStatus" asp-route-id="@Model.Order.Id">
                         <div class="mb-3">
-                            <label asp-for="NewStatus" class="form-label">Nieuwe Status</label>
-                            <select asp-for="NewStatus" class="form-select">
-                                <option value="In behandeling">In behandeling</option>
-                                <option value="Verzonden">Verzonden</option>
+                            <label asp-for="NewStatus" class="form-label fw-bold">Status Workflow</label>
+                            <select asp-for="NewStatus" class="form-select" required>
+                                <option value="">-- Selecteer status --</option>
+                                <option value="In Bewerking">In Bewerking</option>
+                                <option value="Klaar aan het Maken">Klaar aan het Maken</option>
+                                <option value="Klaar voor Levering">Klaar voor Levering</option>
+                                <option value="Onderweg">Onderweg</option>
                                 <option value="Afgeleverd">Afgeleverd</option>
                                 <option value="Geannuleerd">Geannuleerd</option>
                             </select>
+                            <small class="text-muted">Huidige status: <strong>@Model.Order.Status</strong></small>
                         </div>
+
                         <button type="submit" class="btn btn-primary w-100">
-                            <i class="bi bi-check-circle"></i> Status Bijwerken
+                            <i class="bi bi-arrow-right-circle"></i> Update Status
                         </button>
                     </form>
                 </div>

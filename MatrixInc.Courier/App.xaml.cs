@@ -17,8 +17,20 @@ public partial class App : Application
 
 	protected override Window CreateWindow(IActivationState? activationState)
 	{
-		// Krijg OrdersPage van DI container via Handler.MauiContext
-		return new Window(new AppShell())
+		// TIJDELIJK: Reset login status bij elke app start voor debugging
+		// Verwijder deze regel later als login persistence gewenst is
+		Preferences.Clear();
+
+		// Check of gebruiker is ingelogd
+		bool isLoggedIn = Preferences.Get("IsLoggedIn", false);
+
+		#if DEBUG
+		System.Diagnostics.Debug.WriteLine($"[APP] IsLoggedIn: {isLoggedIn}");
+		#endif
+
+		Page mainPage = isLoggedIn ? new AppShell() : new NavigationPage(new LoginPage());
+
+		return new Window(mainPage)
 		{
 			Title = "Matrix Inc Courier"
 		};

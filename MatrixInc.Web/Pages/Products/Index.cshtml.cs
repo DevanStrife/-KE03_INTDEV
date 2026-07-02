@@ -27,6 +27,15 @@ public class IndexModel : PageModel
     [BindProperty(SupportsGet = true)]
     public string? Category { get; set; }
 
+    [BindProperty(SupportsGet = true)]
+    public decimal? MinPrice { get; set; }
+
+    [BindProperty(SupportsGet = true)]
+    public decimal? MaxPrice { get; set; }
+
+    [BindProperty(SupportsGet = true)]
+    public string SortBy { get; set; } = "name";
+
     public async Task OnGetAsync()
     {
         var allProducts = await _productRepository.GetActiveProductsAsync();
@@ -45,7 +54,27 @@ public class IndexModel : PageModel
                 p.Description.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase));
         }
 
-        Products = allProducts;
+        // Prijs filters
+        if (MinPrice.HasValue)
+        {
+            allProducts = allProducts.Where(p => p.Price >= MinPrice.Value);
+        }
+
+        if (MaxPrice.HasValue)
+        {
+            allProducts = allProducts.Where(p => p.Price <= MaxPrice.Value);
+        }
+
+        // Sorteer
+        allProducts = SortBy switch
+        {
+            "price_asc" => allProducts.OrderBy(p => p.Price),
+            "price_desc" => allProducts.OrderByDescending(p => p.Price),
+            "stock" => allProducts.OrderByDescending(p => p.StockQuantity),
+            _ => allProducts.OrderBy(p => p.Name) // name (default)
+        };
+
+        Products = allProducts.ToList();
 
         var categories = await _productRepository.GetCategoriesAsync();
         CategorySelectList = new SelectList(categories);

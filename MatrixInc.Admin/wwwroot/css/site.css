@@ -29,3 +29,24 @@ body {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
 }
+
+/* Admin navbar account dropdown styling */
+.navbar-dark .navbar-nav .nav-link.dropdown-toggle {
+    opacity: 1 !important;
+    color: rgba(255, 255, 255, 0.95) !important;
+}
+
+.navbar-dark .navbar-nav .nav-link.dropdown-toggle:hover,
+.navbar-dark .navbar-nav .nav-link.dropdown-toggle:focus {
+    opacity: 1 !important;
+    color: rgba(255, 255, 255, 1) !important;
+}
+
+.navbar-dark .dropdown.show .nav-link.dropdown-toggle {
+    opacity: 1 !important;
+    color: rgba(255, 255, 255, 1) !important;
+}
+
+.dropdown-item-text {
+    font-size: 0.875rem;
+}

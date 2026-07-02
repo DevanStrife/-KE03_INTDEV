@@ -1,0 +1,100 @@
+@page
+@model MatrixInc.Web.Pages.Account.LoginModel
+@{
+    ViewData["Title"] = "Inloggen";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow">
+                <div class="card-body p-5">
+                    <h2 class="card-title text-center mb-4">
+                        <i class="bi bi-person-circle"></i> Inloggen
+                    </h2>
+
+                    @if (!string.IsNullOrEmpty(TempData["InfoMessage"]?.ToString()))
+                    {
+                        <div class="alert alert-info alert-dismissible fade show" role="alert">
+                            @TempData["InfoMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <div class="alert alert-warning" role="alert">
+                        <i class="bi bi-info-circle"></i> <strong>Gesimuleerd login systeem</strong><br/>
+                        Dit is een demonstratie. Voer willekeurige gegevens in om "in te loggen".
+                    </div>
+
+                    <form method="post">
+                        <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="LoginData.Email" class="form-label">Email adres</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                                <input asp-for="LoginData.Email" class="form-control" placeholder="naam@example.com" />
+                            </div>
+                            <span asp-validation-for="LoginData.Email" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="LoginData.Password" class="form-label">Wachtwoord</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                                <input asp-for="LoginData.Password" type="password" class="form-control" placeholder="••••••••" />
+                            </div>
+                            <span asp-validation-for="LoginData.Password" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3 form-check">
+                            <input asp-for="LoginData.RememberMe" class="form-check-input" />
+                            <label asp-for="LoginData.RememberMe" class="form-check-label">
+                                Onthoud mij
+                            </label>
+                        </div>
+
+                        <input type="hidden" asp-for="LoginData.ReturnUrl" value="@Model.ReturnUrl" />
+
+                        <div class="d-grid gap-2 mb-3">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-box-arrow-in-right"></i> Inloggen
+                            </button>
+                        </div>
+
+                        <div class="text-center">
+                            <a href="#" class="text-muted" onclick="alert('Wachtwoord vergeten functionaliteit is gesimuleerd'); return false;">
+                                <i class="bi bi-question-circle"></i> Wachtwoord vergeten?
+                            </a>
+                        </div>
+
+                        <hr class="my-4"/>
+
+                        <div class="text-center">
+                            <p class="text-muted mb-2">Nog geen account?</p>
+                            <a href="/Account/Register" class="btn btn-outline-secondary">
+                                <i class="bi bi-person-plus"></i> Registreren
+                            </a>
+                        </div>
+                    </form>
+
+                    <!-- Test login button -->
+                    <div class="mt-4 p-3 bg-light border rounded">
+                        <p class="small text-muted mb-2"><strong>Test functie:</strong></p>
+                        <form method="post">
+                            <input type="hidden" name="LoginData.Email" value="test@matrixinc.nl" />
+                            <input type="hidden" name="LoginData.Password" value="test123" />
+                            <button type="submit" class="btn btn-sm btn-success w-100">
+                                <i class="bi bi-lightning"></i> Snel inloggen als test gebruiker
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

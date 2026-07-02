@@ -36,9 +36,12 @@ public static class MauiProgram
 		builder.Services.AddSingleton<CourierOrderService>();
 		builder.Services.AddSingleton<NotificationService>();
 		builder.Services.AddSingleton<LocationService>();
+		builder.Services.AddSingleton<IForegroundNotificationService, ForegroundNotificationService>();
+		builder.Services.AddSingleton<RouteService>();
 
 		// Pages
 		builder.Services.AddTransient<OrdersPage>();
+		builder.Services.AddTransient<OrderDetailsPage>();
 
 		// App
 		builder.Services.AddSingleton<App>();

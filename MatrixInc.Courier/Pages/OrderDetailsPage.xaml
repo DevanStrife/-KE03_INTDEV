@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MatrixInc.Courier.Pages.OrderDetailsPage"
+             Title="Order Details">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="15">
+
+            <!-- Order Header -->
+            <Frame BackgroundColor="#667eea" 
+                   CornerRadius="15" 
+                   Padding="20"
+                   HasShadow="True">
+                <VerticalStackLayout Spacing="10">
+                    <Label x:Name="OrderNumberLabel"
+                           Text="Order #123"
+                           FontSize="24"
+                           FontAttributes="Bold"
+                           TextColor="White"/>
+                    <Frame x:Name="StatusFrame"
+                           BackgroundColor="#4CAF50"
+                           Padding="10,5"
+                           CornerRadius="8"
+                           HasShadow="False"
+                           HorizontalOptions="Start">
+                        <Label x:Name="StatusLabel"
+                               Text="Onderweg"
+                               TextColor="White"
+                               FontAttributes="Bold"/>
+                    </Frame>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Klant Informatie -->
+            <Frame CornerRadius="12" Padding="15" HasShadow="True">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="👤 Klant Informatie"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           TextColor="#333"/>
+
+                    <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" ColumnSpacing="10" RowSpacing="8">
+                        <Label Grid.Row="0" Grid.Column="0" Text="Naam:" FontAttributes="Bold" TextColor="#666"/>
+                        <Label Grid.Row="0" Grid.Column="1" x:Name="CustomerNameLabel" Text="Jan Jansen" TextColor="#333"/>
+
+                        <Label Grid.Row="1" Grid.Column="0" Text="Telefoon:" FontAttributes="Bold" TextColor="#666"/>
+                        <Label Grid.Row="1" Grid.Column="1" x:Name="CustomerPhoneLabel" Text="+31 6 12345678" TextColor="#333">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnPhoneNumberTapped"/>
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </Grid>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Bezorg Adres -->
+            <Frame CornerRadius="12" Padding="15" HasShadow="True" BackgroundColor="#E3F2FD">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="📍 Bezorg Adres"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           TextColor="#1976D2"/>
+
+                    <Label x:Name="AddressLabel"
+                           Text="Straat 123, 1234 AB Stad"
+                           FontSize="16"
+                           TextColor="#333"
+                           LineBreakMode="WordWrap"/>
+
+                    <Button Text="🗺️ Navigeer met Google Maps"
+                            BackgroundColor="#4285F4"
+                            TextColor="White"
+                            CornerRadius="8"
+                            FontAttributes="Bold"
+                            Clicked="OnNavigateClicked"
+                            Margin="0,5,0,0"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Order Details -->
+            <Frame CornerRadius="12" Padding="15" HasShadow="True">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="📦 Order Informatie"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           TextColor="#333"/>
+
+                    <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="8">
+                        <Label Grid.Row="0" Grid.Column="0" Text="Order Datum:" FontAttributes="Bold" TextColor="#666"/>
+                        <Label Grid.Row="0" Grid.Column="1" x:Name="OrderDateLabel" Text="01-01-2024" TextColor="#333"/>
+
+                        <Label Grid.Row="1" Grid.Column="0" Text="Aantal Items:" FontAttributes="Bold" TextColor="#666"/>
+                        <Label Grid.Row="1" Grid.Column="1" x:Name="ItemCountLabel" Text="3" TextColor="#333"/>
+
+                        <Label Grid.Row="2" Grid.Column="0" Text="Totaalbedrag:" FontAttributes="Bold" TextColor="#666"/>
+                        <Label Grid.Row="2" Grid.Column="1" x:Name="TotalAmountLabel" Text="€ 99,99" TextColor="#333" FontAttributes="Bold"/>
+                    </Grid>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Delivery Actions (alleen zichtbaar bij Onderweg status) -->
+            <Frame x:Name="DeliveryActionsFrame"
+                   CornerRadius="12" 
+                   Padding="15" 
+                   HasShadow="True"
+                   BackgroundColor="#FFF9E6"
+                   IsVisible="False">
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="✅ Levering Voltooien"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           TextColor="#856404"/>
+
+                    <Button Text="✅ Pakje Afgeleverd"
+                            BackgroundColor="#4CAF50"
+                            TextColor="White"
+                            CornerRadius="8"
+                            FontAttributes="Bold"
+                            HeightRequest="55"
+                            Clicked="OnDeliveredClicked"/>
+
+                    <Button Text="❌ Klant Niet Thuis (Gemiste Levering)"
+                            BackgroundColor="#FF5722"
+                            TextColor="White"
+                            CornerRadius="8"
+                            FontAttributes="Bold"
+                            HeightRequest="55"
+                            Clicked="OnMissedDeliveryClicked"/>
+                </VerticalStackLayout>
+            </Frame>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

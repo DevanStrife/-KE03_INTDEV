@@ -19,10 +19,17 @@ public class Customer
     [StringLength(20)]
     public string? PhoneNumber { get; set; }
 
+    // Nieuw adres systeem
+    public int? AddressId { get; set; }
+    public Address? Address { get; set; }
+
+    // Oude Address field - behouden voor backwards compatibility
     [StringLength(200)]
-    public string? Address { get; set; }
+    [Obsolete("Use Address navigation property instead")]
+    public string? AddressOld { get; set; }
 
     public DateTime CreatedDate { get; set; } = DateTime.Now;
 
     public ICollection<Order> Orders { get; set; } = new List<Order>();
 }
+

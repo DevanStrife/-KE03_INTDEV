@@ -15,6 +15,7 @@ public class CustomerRepository : ICustomerRepository
     public async Task<IEnumerable<Customer>> GetAllAsync()
     {
         return await _context.Customers
+            .Include(c => c.Address)
             .Include(c => c.Orders)
             .OrderBy(c => c.Name)
             .ToListAsync();
@@ -23,15 +24,17 @@ public class CustomerRepository : ICustomerRepository
     public async Task<Customer?> GetByIdAsync(int id)
     {
         return await _context.Customers
+            .Include(c => c.Address)
             .Include(c => c.Orders)
-            .ThenInclude(o => o.OrderItems)
-            .ThenInclude(oi => oi.Product)
+                .ThenInclude(o => o.OrderItems)
+                    .ThenInclude(oi => oi.Product)
             .FirstOrDefaultAsync(c => c.Id == id);
     }
 
     public async Task<Customer?> GetByEmailAsync(string email)
     {
         return await _context.Customers
+            .Include(c => c.Address)
             .Include(c => c.Orders)
                 .ThenInclude(o => o.OrderItems)
                     .ThenInclude(oi => oi.Product)

@@ -19,6 +19,63 @@
     </div>
 }
 
+<!-- Filters -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-light">
+        <h5 class="mb-0"><i class="bi bi-funnel"></i> Filters</h5>
+    </div>
+    <div class="card-body">
+        <form method="get">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label asp-for="SearchTerm" class="form-label">Zoeken</label>
+                    <input asp-for="SearchTerm" class="form-control" placeholder="Naam of beschrijving..." />
+                </div>
+                <div class="col-md-3">
+                    <label asp-for="CategoryFilter" class="form-label">Categorie</label>
+                    <select asp-for="CategoryFilter" class="form-select">
+                        <option value="">Alle categorieën</option>
+                        @foreach (var category in Model.Categories)
+                        {
+                            <option value="@category">@category</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label asp-for="StockFilter" class="form-label">Voorraad</label>
+                    <select asp-for="StockFilter" class="form-select">
+                        <option value="">Alle voorraadniveaus</option>
+                        <option value="in_stock">Op voorraad (>10)</option>
+                        <option value="low_stock">Lage voorraad (1-10)</option>
+                        <option value="out_of_stock">Uitverkocht (0)</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label asp-for="StatusFilter" class="form-label">Status</label>
+                    <select asp-for="StatusFilter" class="form-select">
+                        <option value="">Alle statussen</option>
+                        <option value="active">Actief</option>
+                        <option value="inactive">Inactief</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-search"></i> Zoeken
+                    </button>
+                    <a asp-page="Index" class="btn btn-secondary">
+                        <i class="bi bi-x-circle"></i> Reset Filters
+                    </a>
+                    <span class="text-muted ms-3">
+                        <strong>@Model.Products.Count()</strong> product(en) gevonden
+                    </span>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
 <div class="card shadow-sm">
     <div class="card-body">
         <div class="table-responsive">
@@ -102,6 +159,13 @@
                     }
                 </tbody>
             </table>
+
+            @if (!Model.Products.Any())
+            {
+                <div class="alert alert-info text-center mb-0">
+                    <i class="bi bi-info-circle"></i> Geen producten gevonden met de huidige filters.
+                </div>
+            }
         </div>
     </div>
 </div>

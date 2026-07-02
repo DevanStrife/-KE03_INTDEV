@@ -1,0 +1,126 @@
+@page
+@model MatrixInc.Admin.Pages.Account.LoginModel
+@{
+    ViewData["Title"] = "Admin Login";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Matrix Inc Admin</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" />
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-card {
+            max-width: 450px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <div class="card shadow-lg">
+            <div class="card-body p-5">
+                <div class="text-center mb-4">
+                    <div class="mb-3">
+                        <i class="bi bi-shield-lock-fill text-primary" style="font-size: 4rem;"></i>
+                    </div>
+                    <h2 class="card-title fw-bold">Matrix Inc Admin</h2>
+                    <p class="text-muted">Administratie Portaal</p>
+                </div>
+
+                <div class="alert alert-warning" role="alert">
+                    <i class="bi bi-info-circle"></i> <strong>Gesimuleerd login systeem</strong><br/>
+                    Voer <u>willekeurige</u> gebruikersnaam en wachtwoord in, of gebruik de snelknop hieronder.
+                </div>
+
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show">
+                        @TempData["SuccessMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="alert alert-danger alert-dismissible fade show">
+                        @TempData["ErrorMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+
+                <form method="post">
+                    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="Username" class="form-label fw-bold">
+                            <i class="bi bi-person"></i> Gebruikersnaam
+                        </label>
+                        <input asp-for="Username" class="form-control form-control-lg" placeholder="admin" autofocus />
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Password" class="form-label fw-bold">
+                            <i class="bi bi-key"></i> Wachtwoord
+                        </label>
+                        <input asp-for="Password" type="password" class="form-control form-control-lg" placeholder="••••••••" />
+                    </div>
+
+                    <div class="mb-3 form-check">
+                        <input asp-for="RememberMe" class="form-check-input" />
+                        <label asp-for="RememberMe" class="form-check-label">
+                            Onthoud mij op dit apparaat
+                        </label>
+                    </div>
+
+                    <div class="d-grid gap-2 mb-3">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-box-arrow-in-right"></i> Inloggen
+                        </button>
+                    </div>
+
+                    <div class="text-center">
+                        <a href="#" class="text-muted small" onclick="alert('Wachtwoord reset functionaliteit is gesimuleerd. Neem contact op met de systeembeheerder.'); return false;">
+                            <i class="bi bi-question-circle"></i> Wachtwoord vergeten?
+                        </a>
+                    </div>
+                </form>
+
+                <hr class="my-4"/>
+
+                <!-- Test login button -->
+                <div class="bg-light p-3 rounded">
+                    <p class="small text-muted mb-2"><strong>Test functie:</strong></p>
+                    <form method="post">
+                        <input type="hidden" name="Username" value="admin" />
+                        <input type="hidden" name="Password" value="admin123" />
+                        <button type="submit" class="btn btn-success btn-sm w-100">
+                            <i class="bi bi-lightning-fill"></i> Snel inloggen als Admin
+                        </button>
+                    </form>
+                </div>
+
+                <div class="text-center mt-4">
+                    <small class="text-muted">
+                        <i class="bi bi-lock-fill"></i> Beveiligde verbinding
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

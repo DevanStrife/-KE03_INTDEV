@@ -7,6 +7,14 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorPages();
 
+// Session support
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
 // Database configuratie
 builder.Services.AddDbContext<MatrixDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
@@ -55,6 +63,38 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseRouting();
+
+app.UseSession();
+
+// Login middleware - Redirect naar login als niet ingelogd
+app.Use(async (context, next) =>
+{
+    var path = context.Request.Path.Value?.ToLower() ?? "";
+    var adminUser = context.Session.GetString("AdminUser");
+
+    // Allow access to login page, logout page, static files, and lib folder
+    if (path.StartsWith("/account/login") || 
+        path.StartsWith("/account/logout") ||
+        path.StartsWith("/lib/") || 
+        path.StartsWith("/css/") || 
+        path.StartsWith("/js/") ||
+        path.Contains(".css") ||
+        path.Contains(".js") ||
+        path.Contains(".map"))
+    {
+        await next();
+        return;
+    }
+
+    // Redirect to login if not authenticated
+    if (string.IsNullOrEmpty(adminUser))
+    {
+        context.Response.Redirect("/Account/Login");
+        return;
+    }
+
+    await next();
+});
 
 app.UseAuthorization();
 

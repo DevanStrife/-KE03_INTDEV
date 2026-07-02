@@ -14,31 +14,71 @@ public class OrderRepository : IOrderRepository
 
     public async Task<IEnumerable<Order>> GetAllAsync()
     {
-        return await _context.Orders
+        var orders = await _context.Orders
             .Include(o => o.Customer)
             .Include(o => o.OrderItems)
-            .ThenInclude(oi => oi.Product)
+                .ThenInclude(oi => oi.Product)
+            .AsSplitQuery()
             .OrderByDescending(o => o.OrderDate)
             .ToListAsync();
+
+        // Explicitly load addresses for customers that have them
+        foreach (var order in orders)
+        {
+            if (order.Customer?.AddressId != null)
+            {
+                await _context.Entry(order.Customer)
+                    .Reference(c => c.Address)
+                    .LoadAsync();
+            }
+        }
+
+        return orders;
     }
 
     public async Task<Order?> GetByIdAsync(int id)
     {
-        return await _context.Orders
+        var order = await _context.Orders
             .Include(o => o.Customer)
             .Include(o => o.OrderItems)
-            .ThenInclude(oi => oi.Product)
+                .ThenInclude(oi => oi.Product)
+            .AsSplitQuery()
             .FirstOrDefaultAsync(o => o.Id == id);
+
+        // Explicitly load address if customer has one
+        if (order?.Customer?.AddressId != null)
+        {
+            await _context.Entry(order.Customer)
+                .Reference(c => c.Address)
+                .LoadAsync();
+        }
+
+        return order;
     }
 
     public async Task<IEnumerable<Order>> GetByCustomerIdAsync(int customerId)
     {
-        return await _context.Orders
+        var orders = await _context.Orders
+            .Include(o => o.Customer)
             .Include(o => o.OrderItems)
-            .ThenInclude(oi => oi.Product)
+                .ThenInclude(oi => oi.Product)
             .Where(o => o.CustomerId == customerId)
+            .AsSplitQuery()
             .OrderByDescending(o => o.OrderDate)
             .ToListAsync();
+
+        // Explicitly load addresses for customers that have them
+        foreach (var order in orders)
+        {
+            if (order.Customer?.AddressId != null)
+            {
+                await _context.Entry(order.Customer)
+                    .Reference(c => c.Address)
+                    .LoadAsync();
+            }
+        }
+
+        return orders;
     }
 
     public async Task<int> CreateOrderAsync(Order order)

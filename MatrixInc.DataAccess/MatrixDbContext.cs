@@ -13,6 +13,7 @@ public class MatrixDbContext : DbContext
     public DbSet<Customer> Customers { get; set; }
     public DbSet<Order> Orders { get; set; }
     public DbSet<OrderItem> OrderItems { get; set; }
+    public DbSet<Address> Addresses { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -34,10 +35,20 @@ public class MatrixDbContext : DbContext
         {
             entity.HasKey(e => e.Id);
             entity.HasIndex(e => e.Email).IsUnique();
+            entity.HasOne(e => e.Address)
+                .WithMany()
+                .HasForeignKey(e => e.AddressId)
+                .OnDelete(DeleteBehavior.SetNull);
             entity.HasMany(e => e.Orders)
                 .WithOne(e => e.Customer)
                 .HasForeignKey(e => e.CustomerId)
                 .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // Address configuratie
+        modelBuilder.Entity<Address>(entity =>
+        {
+            entity.HasKey(e => e.Id);
         });
 
         // Order configuratie
@@ -76,10 +87,45 @@ public class MatrixDbContext : DbContext
             new Product { Id = 8, Name = "Pakking F25", Description = "Rubber pakking 25mm", Price = 3.50m, StockQuantity = 500, Category = "Pakkingen", IsActive = true }
         );
 
-        // Seed Customers
+        // Seed Addresses
+        modelBuilder.Entity<Address>().HasData(
+            new Address { Id = 1, Street = "Hoofdstraat", HouseNumber = "1", PostalCode = "1234AB", City = "Amsterdam", Country = "Nederland" },
+            new Address { Id = 2, Street = "Dorpsweg", HouseNumber = "25", PostalCode = "5678CD", City = "Rotterdam", Country = "Nederland" },
+            new Address { Id = 3, Street = "Kerkstraat", HouseNumber = "42", ApartmentNumber = "2B", PostalCode = "3456EF", City = "Utrecht", Country = "Nederland" }
+        );
+
+        // Seed Customers met nieuwe Address relatie
         modelBuilder.Entity<Customer>().HasData(
-            new Customer { Id = 1, Name = "Jan Bakker", Email = "jan.bakker@example.com", PhoneNumber = "0612345678", Address = "Hoofdstraat 1, 1234AB Amsterdam", CreatedDate = DateTime.Now.AddMonths(-6) },
-            new Customer { Id = 2, Name = "Marie de Vries", Email = "marie.devries@example.com", PhoneNumber = "0687654321", Address = "Dorpsweg 25, 5678CD Rotterdam", CreatedDate = DateTime.Now.AddMonths(-3) }
+            new Customer 
+            { 
+                Id = 1, 
+                Name = "Jan Bakker", 
+                Email = "jan.bakker@example.com", 
+                PhoneNumber = "0612345678", 
+                AddressId = 1,
+                AddressOld = "Hoofdstraat 1, 1234AB Amsterdam", // Backwards compatibility
+                CreatedDate = new DateTime(2024, 6, 1, 12, 0, 0)
+            },
+            new Customer 
+            { 
+                Id = 2, 
+                Name = "Marie de Vries", 
+                Email = "marie.devries@example.com", 
+                PhoneNumber = "0687654321", 
+                AddressId = 2,
+                AddressOld = "Dorpsweg 25, 5678CD Rotterdam",
+                CreatedDate = new DateTime(2024, 9, 1, 12, 0, 0)
+            },
+            new Customer 
+            { 
+                Id = 3, 
+                Name = "Piet Jansen", 
+                Email = "piet.jansen@example.com", 
+                PhoneNumber = "0698765432", 
+                AddressId = 3,
+                AddressOld = "Kerkstraat 42-2B, 3456EF Utrecht",
+                CreatedDate = new DateTime(2024, 11, 1, 12, 0, 0)
+            }
         );
     }
 }

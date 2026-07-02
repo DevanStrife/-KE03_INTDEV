@@ -13,19 +13,48 @@
 
 <div class="row mb-4">
     <div class="col-md-12">
-        <form method="get" class="row g-3">
-            <div class="col-md-6">
-                <input type="text" class="form-control" name="searchTerm" placeholder="Zoek producten..." value="@Model.SearchTerm" />
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <form method="get" class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Zoeken</label>
+                        <input type="text" class="form-control" name="searchTerm" placeholder="Zoek producten..." value="@Model.SearchTerm" />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Categorie</label>
+                        <select name="category" class="form-select" asp-items="@Model.CategorySelectList">
+                            <option value="">Alle categorieën</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label fw-bold">Min. Prijs</label>
+                        <input type="number" class="form-control" name="minPrice" placeholder="€0" step="0.01" value="@Model.MinPrice" />
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label fw-bold">Max. Prijs</label>
+                        <input type="number" class="form-control" name="maxPrice" placeholder="€999" step="0.01" value="@Model.MaxPrice" />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Sorteer op</label>
+                        <select name="sortBy" class="form-select">
+                            <option value="name" selected="@(Model.SortBy == "name")">Naam (A-Z)</option>
+                            <option value="price_asc" selected="@(Model.SortBy == "price_asc")">Prijs (Laag-Hoog)</option>
+                            <option value="price_desc" selected="@(Model.SortBy == "price_desc")">Prijs (Hoog-Laag)</option>
+                            <option value="stock" selected="@(Model.SortBy == "stock")">Voorraad</option>
+                        </select>
+                    </div>
+                    <div class="col-md-9">
+                        <label class="form-label d-block">&nbsp;</label>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-funnel"></i> Filters Toepassen
+                        </button>
+                        <a asp-page="./Index" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Reset
+                        </a>
+                    </div>
+                </form>
             </div>
-            <div class="col-md-4">
-                <select name="category" class="form-select" asp-items="@Model.CategorySelectList">
-                    <option value="">Alle categorieën</option>
-                </select>
-            </div>
-            <div class="col-md-2">
-                <button type="submit" class="btn btn-primary w-100">Zoeken</button>
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 

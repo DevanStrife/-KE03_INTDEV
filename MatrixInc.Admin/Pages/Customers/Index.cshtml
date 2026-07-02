@@ -17,6 +17,34 @@
         </div>
     }
 
+    <!-- Filter Section -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-8">
+                    <label class="form-label fw-bold">Zoek Klant</label>
+                    <input type="text" name="searchTerm" class="form-control" placeholder="Naam, email of stad..." value="@Model.SearchTerm" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Sorteer op</label>
+                    <select name="sortBy" class="form-select" onchange="this.form.submit()">
+                        <option value="name" selected="@(Model.SortBy == "name")">Naam (A-Z)</option>
+                        <option value="email" selected="@(Model.SortBy == "email")">Email (A-Z)</option>
+                        <option value="orders" selected="@(Model.SortBy == "orders")">Meeste bestellingen</option>
+                    </select>
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-search"></i> Zoeken
+                    </button>
+                    <a asp-page="./Index" class="btn btn-secondary">
+                        <i class="bi bi-x-circle"></i> Reset
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
     @if (Model.Customers.Any())
     {
         <div class="card shadow-sm">
@@ -59,9 +87,13 @@
                                         }
                                     </td>
                                     <td>
-                                        @if (!string.IsNullOrEmpty(customer.Address))
+                                        @if (customer.Address != null)
                                         {
-                                            @customer.Address
+                                            @customer.Address.FullAddress
+                                        }
+                                        else if (!string.IsNullOrEmpty(customer.AddressOld))
+                                        {
+                                            @customer.AddressOld
                                         }
                                         else
                                         {

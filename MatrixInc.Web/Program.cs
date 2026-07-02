@@ -23,6 +23,7 @@ builder.Services.AddDbContext<MatrixDbContext>(options =>
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IAddressRepository, AddressRepository>();
 
 // Services
 builder.Services.AddHttpContextAccessor();

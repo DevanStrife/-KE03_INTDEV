@@ -42,10 +42,46 @@ public class DetailsModel : PageModel
             return NotFound();
         }
 
+        if (string.IsNullOrEmpty(NewStatus))
+        {
+            TempData["ErrorMessage"] = "Selecteer een status.";
+            return RedirectToPage(new { id });
+        }
+
         order.Status = NewStatus;
         await _orderRepository.UpdateAsync(order);
 
-        TempData["SuccessMessage"] = "Order status succesvol bijgewerkt.";
+        TempData["SuccessMessage"] = $"Order status bijgewerkt naar '{NewStatus}'.";
+        return RedirectToPage(new { id });
+    }
+
+    public async Task<IActionResult> OnPostPrintLabelAsync(int id)
+    {
+        var order = await _orderRepository.GetByIdAsync(id);
+
+        if (order == null)
+        {
+            return NotFound();
+        }
+
+        // Controleer of bestelling al is afgeleverd of geannuleerd
+        if (order.Status == "Afgeleverd" || order.Status == "Geannuleerd")
+        {
+            TempData["ErrorMessage"] = $"Label kan niet meer geprint worden. Bestelling is {order.Status.ToLower()}.";
+            return RedirectToPage(new { id });
+        }
+
+        // GESIMULEERD: Print label (in echte app zou hier een PDF gegenereerd worden)
+        var labelInfo = $"VERZENDLABEL #{order.Id}\n" +
+                       $"Naar: {order.Customer?.Name}\n" +
+                       $"Adres: {order.Customer?.Address?.FullAddress ?? order.Customer?.AddressOld}\n" +
+                       $"Items: {order.OrderItems.Count}\n" +
+                       $"Totaal: €{order.TotalAmount:F2}";
+
+        Console.WriteLine($"📄 PRINT GESIMULEERD:\n{labelInfo}");
+
+        // Informeer gebruiker dat dit een simulatie is
+        TempData["SuccessMessage"] = $"✅ Verzendlabel print gesimuleerd! (Bestelling #{order.Id} - Status: {order.Status})";
         return RedirectToPage(new { id });
     }
 }

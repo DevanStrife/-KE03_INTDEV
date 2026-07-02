@@ -50,10 +50,60 @@
                         <span asp-validation-for="CustomerPhone" class="text-danger"></span>
                     </div>
 
-                    <div class="mb-3">
-                        <label asp-for="CustomerAddress" class="form-label"></label>
-                        <textarea asp-for="CustomerAddress" class="form-control" rows="3"></textarea>
-                        <span asp-validation-for="CustomerAddress" class="text-danger"></span>
+                    <hr class="my-4" />
+                    <h6 class="mb-3">Adresgegevens</h6>
+
+                    <div class="row">
+                        <div class="col-md-8 mb-3">
+                            <label asp-for="Street" class="form-label"></label>
+                            <input asp-for="Street" class="form-control" placeholder="Straatnaam" />
+                            <span asp-validation-for="Street" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="HouseNumber" class="form-label"></label>
+                            <input asp-for="HouseNumber" class="form-control" placeholder="123" />
+                            <span asp-validation-for="HouseNumber" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="PostalCode" class="form-label"></label>
+                            <input asp-for="PostalCode" class="form-control" placeholder="1234 AB" />
+                            <span asp-validation-for="PostalCode" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="ApartmentNumber" class="form-label"></label>
+                            <input asp-for="ApartmentNumber" class="form-control" placeholder="Toevoeging (optioneel)" />
+                            <span asp-validation-for="ApartmentNumber" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="City" class="form-label"></label>
+                            <input asp-for="City" class="form-control" placeholder="Plaats" />
+                            <span asp-validation-for="City" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Province" class="form-label"></label>
+                            <select asp-for="Province" class="form-select">
+                                <option value="">-- Selecteer provincie --</option>
+                                <option value="Drenthe">Drenthe</option>
+                                <option value="Flevoland">Flevoland</option>
+                                <option value="Friesland">Friesland</option>
+                                <option value="Gelderland">Gelderland</option>
+                                <option value="Groningen">Groningen</option>
+                                <option value="Limburg">Limburg</option>
+                                <option value="Noord-Brabant">Noord-Brabant</option>
+                                <option value="Noord-Holland">Noord-Holland</option>
+                                <option value="Overijssel">Overijssel</option>
+                                <option value="Utrecht">Utrecht</option>
+                                <option value="Zeeland">Zeeland</option>
+                                <option value="Zuid-Holland">Zuid-Holland</option>
+                            </select>
+                            <span asp-validation-for="Province" class="text-danger"></span>
+                        </div>
                     </div>
 
                     <div class="mb-4">
